@@ -1,45 +1,54 @@
 import re
+import os
 import nltk
 
+NLTK_DIR = "/opt/render/nltk_data"
+
+os.makedirs(NLTK_DIR, exist_ok=True)
+
+nltk.data.path.append(NLTK_DIR)
+
+# -----------------------------
+# Download NLTK resources
+# -----------------------------
+
+resources = [
+    ("corpora/stopwords", "stopwords"),
+    ("corpora/wordnet", "wordnet"),
+    ("corpora/omw-1.4", "omw-1.4"),
+]
+
+for path, package in resources:
+    try:
+        nltk.data.find(path)
+    except LookupError:
+        nltk.download(package, download_dir=NLTK_DIR)
+
+# -----------------------------
+# Imports AFTER download
+# -----------------------------
+
 from nltk.corpus import stopwords
-from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
 
 lemmatizer = WordNetLemmatizer()
 
 stop_words = set(stopwords.words("english"))
 
+# -----------------------------
+# Cleaning Functions
+# -----------------------------
 
 def remove_html(text):
-
     return re.sub(r"<.*?>", "", text)
 
 
 def remove_url(text):
-
-    return re.sub(r"http?://\S+|www\.\S+", "", text)
+    return re.sub(r"http[s]?://\S+|www\.\S+", "", text)
 
 
 def remove_punctuation(text):
-
     return re.sub(r"[^\w\s]", "", text)
-
-
-def get_wordnet_pos(tag):
-
-    if tag.startswith("J"):
-        return wordnet.ADJ
-
-    elif tag.startswith("V"):
-        return wordnet.VERB
-
-    elif tag.startswith("N"):
-        return wordnet.NOUN
-
-    elif tag.startswith("R"):
-        return wordnet.ADV
-
-    return wordnet.NOUN
 
 
 def preprocess_text(text):
@@ -54,11 +63,8 @@ def preprocess_text(text):
 
     words = text.split()
 
-    words = [w for w in words if w not in stop_words]
+    words = [word for word in words if word not in stop_words]
 
-    words = [
-    lemmatizer.lemmatize(word)
-    for word in words
-    ]
+    words = [lemmatizer.lemmatize(word) for word in words]
 
     return " ".join(words)
