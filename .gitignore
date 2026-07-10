@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+.env
+
+email_spam_detection.keras
+
+word2vec.model
+word2vec.model.syn1neg.npy
+word2vec.model.wv.vectors.npy
